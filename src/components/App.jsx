@@ -17,24 +17,27 @@ export class App extends Component {
   };
 
   onAddContacts = ({ name, number }) => {
-    this.setState(({ contacts }) => {
-      const isContact = contacts.find(contact => contact.name === name);
+    const { contacts } = this.state;
 
-      if (isContact) {
-        alert(`${name} is already in contact`);
-        return contacts;
-      } else {
-        const newContact = {
-          id: nanoid(),
-          name,
-          number,
-        };
-        return {
-          contacts: [newContact, ...contacts],
-        };
-      }
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
+
+    const isContact = contacts.find(
+      contact => contact.name === name.toLowerCase()
+    );
+    if (isContact) {
+      alert(`${name} is already in contact`);
+      return contacts;
+    }    
+    this.setState(({ contacts }) => {
+      return {
+        contacts: [newContact, ...contacts],
+      };
     });
-  };
+  }
 
   changeFilter = evt => {
     this.setState({ filter: evt.currentTarget.value });
@@ -60,11 +63,15 @@ export class App extends Component {
         <AddContactForm onAddContacts={this.onAddContacts} />
 
         <h2>Contacts</h2>
-        <SearchFilter filter={filter} onHandleChange={this.changeFilter} />
-        <ContactList
-          contacts={visibleContacts}
-          onDeleteContacts={this.onDeleteContacts}
-        />
+        {contacts.length > 0 && (
+          <SearchFilter filter={filter} onHandleChange={this.changeFilter} />
+        )}
+        {contacts.length > 0 && (
+          <ContactList
+            contacts={visibleContacts}
+            onDeleteContacts={this.onDeleteContacts}
+          />
+        )}
       </div>
     );
   }
